@@ -10,11 +10,10 @@ const Navbar = () => {
       </div>
       <div className='flex-none'>
         <Link to='/profile' tabIndex={0} role='button' className='btn btn-ghost btn-circle avatar'>
-          <div className='w-10 rounded-full'>
-            <img
-              alt='Tailwind CSS Navbar component'
-              src='https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.jpg'
-            />
+          <div className='avatar placeholder'>
+            <div className='bg-slate-100 p-4 text-black rounded-full'>
+              <span className='text-2xl'>EH</span>
+            </div>
           </div>
         </Link>
       </div>

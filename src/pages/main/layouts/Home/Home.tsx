@@ -6,6 +6,7 @@ import { CiSearch } from 'react-icons/ci'
 import CommentsTable from '../../../../components/Card/CommentsTable'
 import { FaArrowDown, FaArrowUp } from 'react-icons/fa'
 import useTablebar from '../../../../hooks/useTablebar'
+
 interface NextParamProps {
   limit: number
   page: number
@@ -17,32 +18,6 @@ const Home = () => {
     page: 1,
     limit: 10,
   })
-  const { comments, isLoading, totalPages, displayToast } = useComments(nextParam)
-
-  useEffect(() => {
-    // setSearchText(localStorage.getItem('searchText') || '')
-    
-    setNextParam({
-      limit: Number(localStorage.getItem('limit')) || 10 ,
-      page: Number(localStorage.getItem('page')) || 1 
-    })
-    const sortParam: {
-      name: string
-      type: string
-      value: string
-    } = JSON.parse(localStorage.getItem('sortParam')!)
-    setSortParams(sortParams.map(item => {
-      if(item.value === sortParam.value){
-        return sortParam
-      }
-      return item
-    }))
-    
-  },[])
-
-  const searchDebounce = searchDebounceHandler(setSearchText)
-  const percentageHeight = useTablebar()
-
   const [sortParams, setSortParams] = useState([
     {
       name: 'Post ID',
@@ -60,6 +35,22 @@ const Home = () => {
       type: 'none',
     },
   ])
+  const { comments, isLoading, totalPages, displayToast } = useComments(nextParam)
+
+  useEffect(() => {
+    setNextParam({
+      limit: Number(localStorage.getItem('limit')) || 10 ,
+      page: Number(localStorage.getItem('page')) || 1 
+    })
+    if(localStorage.getItem('sortParams')){
+      setSortParams(JSON.parse(localStorage.getItem('sortParams')!))
+    }
+  },[])
+
+  const searchDebounce = searchDebounceHandler(setSearchText)
+  const percentageHeight = useTablebar()
+
+  
 
   const filterSort = (toChangeIndex: number) => {
     const changeSortType = (type: string) => {
@@ -67,18 +58,16 @@ const Home = () => {
       if (type === 'asc') return 'desc'
       return 'none'
     }
-    return sortParams.map((param, index) => {
-      let type = 'none'
-      if(index === toChangeIndex){
-        type = changeSortType(param.type)
-        localStorage.setItem('sortParam', JSON.stringify({ ...param, type }))
-      }
+    const newSortParams = sortParams.map((param, index) => {
+      const type = index === toChangeIndex ? changeSortType(param.type) : 'none'
       return { ...param, type }
     })
+    localStorage.setItem('sortParams', JSON.stringify(newSortParams))
+    return newSortParams
   }
 
-  const currentSort = sortParams.find((param) => param.type === 'asc' || param.type === 'desc') || JSON.parse(localStorage.getItem('sortParam')!) || sortParams[0]
   const filteredComments = () => {
+    const currentSort = sortParams.find((param) => param.type === 'asc' || param.type === 'desc') || sortParams[0]
     const currentArray = comments.filter(
       (comment) =>
         searchText === '' ||
@@ -138,7 +127,7 @@ const Home = () => {
             <button className={`join-item ${nextParam.page < totalPages && 'btn'}`} onClick={() => {
               localStorage.setItem('page', String(nextParam.page + 1)) 
               setNextParam({...nextParam, page: nextParam.page + 1})
-            }}>{nextParam.page < 5 && '»'}</button>
+            }}>{nextParam.page < totalPages && '»'}</button>
           </div>
           <select className="select select-bordered w-24" onChange={(e) => {
             localStorage.setItem('limit', e.target.value)

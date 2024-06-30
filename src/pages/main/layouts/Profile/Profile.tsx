@@ -25,8 +25,8 @@ const Profile = () => {
       <section className='border-4 border-slate-100 p-8 h-full flex flex-col gap-4 '>
         <section className='flex items-center gap-2'>
           <div className='avatar placeholder'>
-            <div className='bg-neutral text-neutral-content w-24 rounded-full'>
-              <span className='text-3xl'>{name[0]}</span>
+            <div className='bg-slate-100 p-4 text-black rounded-full'>
+              <span className='text-2xl'>{name[0]}H</span>
             </div>
           </div>
           <div className='flex flex-col'>
