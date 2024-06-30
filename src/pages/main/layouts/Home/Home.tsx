@@ -1,5 +1,4 @@
-import { useState } from 'react'
-import TableData from '../../../../components/Card/TableData'
+import { useEffect, useState } from 'react'
 import useComments from '../../../../hooks/useComments'
 import Index from '../../../Index'
 import { searchDebounceHandler } from '../../../../helpers/debounce'
@@ -19,6 +18,27 @@ const Home = () => {
     limit: 10,
   })
   const { comments, isLoading, totalPages, displayToast } = useComments(nextParam)
+
+  useEffect(() => {
+    // setSearchText(localStorage.getItem('searchText') || '')
+    
+    setNextParam({
+      limit: Number(localStorage.getItem('limit')) || 10 ,
+      page: Number(localStorage.getItem('page')) || 1 
+    })
+    const sortParam: {
+      name: string
+      type: string
+      value: string
+    } = JSON.parse(localStorage.getItem('sortParam')!)
+    setSortParams(sortParams.map(item => {
+      if(item.value === sortParam.value){
+        return sortParam
+      }
+      return item
+    }))
+    
+  },[])
 
   const searchDebounce = searchDebounceHandler(setSearchText)
   const percentageHeight = useTablebar()
@@ -48,13 +68,17 @@ const Home = () => {
       return 'none'
     }
     return sortParams.map((param, index) => {
-      let type = index == toChangeIndex ? changeSortType(param.type) : 'none'
+      let type = 'none'
+      if(index === toChangeIndex){
+        type = changeSortType(param.type)
+        localStorage.setItem('sortParam', JSON.stringify({ ...param, type }))
+      }
       return { ...param, type }
     })
   }
 
+  const currentSort = sortParams.find((param) => param.type === 'asc' || param.type === 'desc') || JSON.parse(localStorage.getItem('sortParam')!) || sortParams[0]
   const filteredComments = () => {
-    const currentSort = sortParams.find((param) => param.type === 'asc' || param.type === 'desc') || sortParams[0]
     const currentArray = comments.filter(
       (comment) =>
         searchText === '' ||
@@ -103,11 +127,23 @@ const Home = () => {
         </section>
         <section className='flex gap-4 justify-end w-full'>
           <div className="join">
-            <button className={`join-item ${nextParam.page > 1 && 'btn'}`} onClick={() => setNextParam({...nextParam, page: nextParam.page - 1})}>{nextParam.page > 1 && '«'}</button>
+            
+            <button className={`join-item ${nextParam.page > 1 && 'btn'}`} onClick={() => {
+              setNextParam({...nextParam, page: nextParam.page - 1})
+              localStorage.setItem('page', String(nextParam.page - 1)) 
+            }}>{nextParam.page > 1 && '«'}</button>
+
             <button className="join-item btn">Page {nextParam.page}</button>
-            <button className={`join-item ${nextParam.page < totalPages && 'btn'}`} onClick={() => setNextParam({...nextParam, page: nextParam.page + 1})}>{nextParam.page < 5 && '»'}</button>
+            
+            <button className={`join-item ${nextParam.page < totalPages && 'btn'}`} onClick={() => {
+              localStorage.setItem('page', String(nextParam.page + 1)) 
+              setNextParam({...nextParam, page: nextParam.page + 1})
+            }}>{nextParam.page < 5 && '»'}</button>
           </div>
-          <select className="select select-bordered w-24" onChange={(e) => setNextParam({...nextParam, limit: Number(e.target.value)})}>
+          <select className="select select-bordered w-24" onChange={(e) => {
+            localStorage.setItem('limit', e.target.value)
+            setNextParam({...nextParam, limit: Number(e.target.value)})
+          }}>
             <option disabled selected>Limit</option>
             <option>10</option>
             <option>20</option>
