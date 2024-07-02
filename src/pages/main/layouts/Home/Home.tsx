@@ -5,7 +5,7 @@ import { searchDebounceHandler } from '../../../../helpers/debounce'
 import { CiSearch } from 'react-icons/ci'
 import CommentsTable from '../../../../components/Card/CommentsTable'
 import { FaArrowDown, FaArrowUp } from 'react-icons/fa'
-import useTablebar from '../../../../hooks/useTablebar'
+// import useTablebar from '../../../../hooks/useTablebar'
 
 interface NextParamProps {
   limit: number
@@ -48,7 +48,7 @@ const Home = () => {
   },[])
 
   const searchDebounce = searchDebounceHandler(setSearchText)
-  const percentageHeight = useTablebar()
+  // const percentageHeight = useTablebar()
 
   
 
@@ -79,8 +79,10 @@ const Home = () => {
       return currentArray
     }
     if (currentSort.type === 'asc') {
+      // @ts-ignore
       return currentArray.sort((a, b) => (a[currentSort.value] > b[currentSort.value] ? 1 : -1))
     }
+    // @ts-ignore
     return currentArray.sort((a, b) => (a[currentSort.value] > b[currentSort.value] ? -1 : 1))
   }
 
